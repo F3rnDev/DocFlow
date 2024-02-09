@@ -1,7 +1,7 @@
-from PyQt6.QtWidgets import QPushButton, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit, QSizePolicy
+import os
+from PyQt6.QtWidgets import QPushButton, QWidget, QLabel, QHBoxLayout, QLineEdit, QFileDialog
 from PyQt6.QtCore import Qt
 from components.flowStep import FlowStep
-from PyQt6.QtGui import QPixmap, QColor, QPainter, QResizeEvent
 from PIL import Image
 from PyQt6.QtCore import QRect
 from src.main.flow import Flow
@@ -28,7 +28,7 @@ class FlowCreator(QWidget):
 
         exportBtn = QPushButton('Exportar Imagens', self)
         exportBtn.setGeometry(500, 20, 200, 50)
-        exportBtn.clicked.connect(self.exportImages)
+        exportBtn.clicked.connect(self.openExportWindow)
         
         self.flowLayout = QHBoxLayout(self.flow)
         self.flowLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -56,12 +56,24 @@ class FlowCreator(QWidget):
         self.loadedFlow.deleteStep()
         self.updateFlow()
     
-    def exportImages(self):
+    def openExportWindow(self):
+        docFile = None
+
+        if self.flowLayout.count() > 0:
+            docFile = QFileDialog.getExistingDirectory(self, 'Selecione a pasta para exportar as imagens')
+        
+        if docFile:
+            self.exportImages(docFile)
+    
+    def exportImages(self, path):
+        flowFolder = os.path.join(path, 'flow_images')
+        os.makedirs(flowFolder, exist_ok=True)
+
         for i in range(self.flowLayout.count()):
             step = self.flowLayout.itemAt(i).widget()
 
             if isinstance(step, FlowStep):
                 img = Image.fromqpixmap(step.generateImage())
-                img.save(f'flowStep{i}.png')
+                img.save(os.path.join(flowFolder, f'flowStep{i}.png'))
 
                 print(img.size)
