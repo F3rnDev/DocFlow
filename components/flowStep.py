@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGraphicsOpacityEffect
 from PyQt6.QtCore import Qt
+from src.main.resource import Resource
 from PIL import Image
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import QRect, QSize
@@ -7,6 +8,8 @@ from PyQt6.QtCore import QRect, QSize
 class FlowStep(QWidget):
     def __init__(self, name, icon, hasStep = False):
         super().__init__()
+
+        self.defaultArrowIcon = Resource.resource_path('assets/nextFlowStep.png')
 
         self.curIcon = icon
         self.curName = name
@@ -38,7 +41,7 @@ class FlowStep(QWidget):
         self.arrowImg.fill(Qt.GlobalColor.transparent)
 
         if hasStep:
-            self.arrowImg = QPixmap('assets/nextFlowStep.png').scaled(100, 100)
+            self.arrowImg = QPixmap(self.defaultArrowIcon).scaled(100, 100)
             self.hasStep = True
 
         self.arrow.setPixmap(self.arrowImg)
@@ -73,7 +76,7 @@ class FlowStep(QWidget):
         ''')
 
         if self.hasStep:
-            self.arrowImg = QPixmap('assets/nextFlowStep.png').scaled(100, 100)
+            self.arrowImg = QPixmap(self.defaultArrowIcon).scaled(100, 100)
             self.arrow.setPixmap(self.arrowImg)
     
 
@@ -88,7 +91,7 @@ class FlowStep(QWidget):
         self.layout.setSpacing(int(50*scale))
 
         if self.hasStep:
-            self.arrowImg = QPixmap('assets/nextFlowStep.png').scaled(int(100*scale), int(100*scale))
+            self.arrowImg = QPixmap(self.defaultArrowIcon).scaled(int(100*scale), int(100*scale))
             self.arrow.setPixmap(self.arrowImg)
         else:
             self.arrowImg = QPixmap(100, 100)

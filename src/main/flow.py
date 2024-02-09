@@ -1,11 +1,13 @@
 from PyQt6.QtGui import QPixmap
+from src.main.resource import Resource
 
 class Flow:
     def __init__(self):
         self.flow = []
     
     def addStep(self):
-        self.flow.append(Step("default", QPixmap('assets/defaultIcon.png')))
+        defaultIcon = Resource.resource_path('assets/defaultIcon.png')
+        self.flow.append(Step("default", QPixmap(defaultIcon)))
     
     def deleteStep(self):
         if self.flow.__len__() > 0:
