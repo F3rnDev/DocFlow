@@ -1,9 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGraphicsOpacityEffect
-from PyQt6.QtCore import Qt
 from src.main.resource import Resource
-from PIL import Image
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import QRect, QSize
+from PyQt6.QtGui import QPixmap, QPainter, QPaintEvent, QRegion
+from PyQt6.QtCore import QRect, QSize, Qt
 
 class FlowStep(QWidget):
     def __init__(self, name, icon, hasStep = False):
@@ -20,14 +18,17 @@ class FlowStep(QWidget):
 
         self.content = QWidget(self)
         self.content.setGeometry(QRect(0, 0, 800, 800))
+        self.content.setStyleSheet('background-color: transparent;')
 
         self.flowImg = QLabel()
         self.flowImg.setPixmap(self.curIcon.scaled(200, 200))
+        self.flowImg.setStyleSheet('background-color: transparent;')
 
         self.flowTxt = QLabel(self.curName)
         self.flowTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.flowTxt.setStyleSheet('''
             font-size: 50px;
+            background-color: transparent;                       
         ''')
 
         self.contentLayout = QVBoxLayout(self.content)
@@ -35,7 +36,9 @@ class FlowStep(QWidget):
         self.contentLayout.addWidget(self.flowTxt)
 
         self.layout.addWidget(self.content)
+
         self.arrow = QLabel()
+        self.arrow.setStyleSheet('background-color: transparent;')
 
         self.arrowImg = QPixmap(100, 100)
         self.arrowImg.fill(Qt.GlobalColor.transparent)
@@ -43,9 +46,10 @@ class FlowStep(QWidget):
         if hasStep:
             self.arrowImg = QPixmap(self.defaultArrowIcon).scaled(100, 100)
             self.hasStep = True
-
+        
         self.arrow.setPixmap(self.arrowImg)
         self.layout.addWidget(self.arrow)
+
     
     def generateImage(self):
         # desired_width = 700
@@ -58,8 +62,12 @@ class FlowStep(QWidget):
         scale = 1.5
 
         self.resizeWidget(scale)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         
         pixmap = QPixmap(self.size())
+        pixmap.fill(Qt.GlobalColor.transparent)
+
         self.render(pixmap)
 
         self.resetWidget()
@@ -83,7 +91,7 @@ class FlowStep(QWidget):
     def resizeWidget(self, scale):
         self.setStyleSheet('background-color: #ffffff;')
 
-        self.flowImg.setPixmap(self.curIcon.scaled(int(self.flowImg.width()*scale), int(self.flowImg.height()*scale)))
+        self.flowImg.setPixmap(self.curIcon.scaled(int(200*scale), int(200*scale)))
         self.flowTxt.setStyleSheet(f'''
             font-size: {int(50*scale)}px;
         ''')
@@ -98,3 +106,4 @@ class FlowStep(QWidget):
             self.arrowImg.fill(Qt.GlobalColor.transparent)
         
         self.resize(((self.size() * scale)) + QSize(self.layout.spacing(), 0))
+        print(self.size())
