@@ -70,22 +70,9 @@ class FlowStep(QWidget):
 
         self.render(pixmap)
 
-        self.resetWidget()
+        self.resizeWidget(1)
 
         return pixmap.toImage()
-    
-
-    def resetWidget(self):
-        self.layout.setSpacing(50)
-
-        self.flowImg.setPixmap(self.curIcon.scaled(200, 200))
-        self.flowTxt.setStyleSheet('''
-            font-size: 50px;
-        ''')
-
-        if self.hasStep:
-            self.arrowImg = QPixmap(self.defaultArrowIcon).scaled(100, 100)
-            self.arrow.setPixmap(self.arrowImg)
     
 
     def resizeWidget(self, scale):
@@ -106,4 +93,3 @@ class FlowStep(QWidget):
             self.arrowImg.fill(Qt.GlobalColor.transparent)
         
         self.resize(((self.size() * scale)) + QSize(self.layout.spacing(), 0))
-        print(self.size())
