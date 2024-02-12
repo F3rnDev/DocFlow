@@ -5,7 +5,7 @@ from components.window import Window
 appName = "DocFlow"
 appVersion = "0.0.1"
 defaultTitle = f"{appName} {appVersion}"
-windowSize = [1280 , 720]
+windowSize = [1920 , 1080]
 
 def startApplication():
     app = QApplication([])
