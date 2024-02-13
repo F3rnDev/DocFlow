@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QApplication, QHBoxLayout
-from PyQt6.QtGui import QMouseEvent, QPalette, QColor
+from PyQt6.QtWidgets import QWidget, QApplication, QHBoxLayout, QStyleOption, QStyle
+from PyQt6.QtGui import QMouseEvent, QPainter
 from PyQt6.QtCore import QRect, QPoint, Qt
 from components.flowStep import FlowStep
 from PIL import Image
@@ -10,10 +10,9 @@ class FlowCanvas(QWidget):
         super().__init__(parent)
         self.setGeometry(QRect(0, 0, 10000, 10000))
 
-        palette = QPalette()
-        palette.setColor(QPalette.ColorRole.Window, QColor("#ffffff"))
-        self.setPalette(palette)
-        self.setAutoFillBackground(True)
+        self.selectedStep = 0
+
+        self.setStyleSheet('background-color: #ffffff;')
 
         self.layout = QHBoxLayout(self)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -29,18 +28,9 @@ class FlowCanvas(QWidget):
         flowY = (screenGeometry.height() - self.height()) // 2
         self.move(flowX, flowY)
     
-    def updateFlow(self, loadedFlow):
-        while self.layout.count():
-            item = self.layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
-
-        for stepId, step in enumerate(loadedFlow.flow, start=0):
-            if stepId == loadedFlow.flow.__len__() - 1:
-                self.layout.addWidget(FlowStep(step.name, step.icon))
-            else:
-                self.layout.addWidget(FlowStep(step.name, step.icon, True))
+    def onStepClick(self, id):
+        self.selectedStep = id
+        self.parent().updateFlow(self.parent().loadedFlow)
 
     def exportImages(self, path):
         flowFolder = os.path.join(path, 'flow_images')
@@ -54,6 +44,13 @@ class FlowCanvas(QWidget):
                 img.save(os.path.join(flowFolder, f'flowStep{i}.png'))
 
                 print(img.size)
+    
+    def paintEvent(self, pe):
+        o = QStyleOption()
+        o.initFrom(self)
+        p = QPainter(self)
+        self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, o, p, self)
+
     
     #moving the flow canvas
     def mousePressEvent(self, event: QMouseEvent):

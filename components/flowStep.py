@@ -1,11 +1,16 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGraphicsOpacityEffect
+from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyleOption, QStyle
 from src.main.resource import Resource
-from PyQt6.QtGui import QPixmap, QPainter, QPaintEvent, QRegion
-from PyQt6.QtCore import QRect, QSize, Qt
+from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen
+from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
 
 class FlowStep(QWidget):
-    def __init__(self, name, icon, hasStep = False):
+    clicked = pyqtSignal(int)
+
+    def __init__(self, name, icon, id, hasStep = False):
         super().__init__()
+
+        self.id = id
+        self.selected = False
 
         self.defaultArrowIcon = Resource.resource_path('assets/nextFlowStep.png')
 
@@ -49,9 +54,21 @@ class FlowStep(QWidget):
         
         self.arrow.setPixmap(self.arrowImg)
         self.layout.addWidget(self.arrow)
+    
+    def setSelected(self, selected):
+        self.selected = selected
 
+    def setName(self, name):
+        self.curName = name
+        self.flowTxt.setText(name)
     
     def generateImage(self):
+        wasSelected = False
+
+        if self.selected == True:
+            wasSelected = True
+            self.setSelected(False)
+
         # desired_width = 700
         # desired_height = 700
 
@@ -72,11 +89,14 @@ class FlowStep(QWidget):
 
         self.resizeWidget(1)
 
+        if wasSelected:
+            self.setSelected(True)
+
         return pixmap.toImage()
     
 
     def resizeWidget(self, scale):
-        self.setStyleSheet('background-color: #ffffff;')
+        self.setStyleSheet('background-color: transparent;')
 
         self.flowImg.setPixmap(self.curIcon.scaled(int(200*scale), int(200*scale)))
         self.flowTxt.setStyleSheet(f'''
@@ -93,3 +113,24 @@ class FlowStep(QWidget):
             self.arrowImg.fill(Qt.GlobalColor.transparent)
         
         self.resize(((self.size() * scale)) + QSize(self.layout.spacing(), 0))
+    
+    def paintEvent(self, pe):
+        o = QStyleOption()
+        o.initFrom(self)
+        p = QPainter(self)
+        self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, o, p, self)
+
+        if self.selected:
+            outlinePainter = QPainter(self)
+            outlinePainter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+            pen = QPen(Qt.PenStyle.DashLine)
+            outlinePainter.setPen(pen)
+
+            # Desenha um quadrado ao redor do widget
+            square_rect = self.rect()
+            outlinePainter.drawRect(square_rect)
+
+    def mousePressEvent(self, event: QMouseEvent):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit(self.id)
