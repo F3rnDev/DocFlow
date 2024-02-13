@@ -53,10 +53,10 @@ class FlowCreator(QWidget):
             
             self.flow.layout.itemAt(stepId).widget().clicked.connect(self.flow.onStepClick)
         
-        self.flow.layout.itemAt(self.flow.selectedStep).widget().setSelected(True)
-        self.loadStepInfo(self.flow.selectedStep)
-
-        if loadedFlow.flow.__len__() == 0:
+        if self.loadedFlow.flow.__len__() > 0:
+            self.flow.layout.itemAt(self.flow.selectedStep).widget().setSelected(True)
+            self.loadStepInfo(self.flow.selectedStep)
+        else:
             self.loadStepInfo(None)
     
     def loadStepInfo(self, stepId: int):
@@ -68,8 +68,9 @@ class FlowCreator(QWidget):
             self.stepName.setText(self.loadedFlow.flow[stepId].name)
     
     def updateStepInfo(self):
-        self.loadedFlow.flow[self.flow.selectedStep].setName(self.stepName.text())
-        self.flow.layout.itemAt(self.flow.selectedStep).widget().setName(self.stepName.text())
+        if self.loadedFlow.flow.__len__() > 0:
+            self.loadedFlow.flow[self.flow.selectedStep].setName(self.stepName.text())
+            self.flow.layout.itemAt(self.flow.selectedStep).widget().setName(self.stepName.text())
     
     def addFlowStep(self):
         self.loadedFlow.addStep()
