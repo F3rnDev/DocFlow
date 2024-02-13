@@ -44,8 +44,6 @@ class FlowCreator(QWidget):
                 widget.deleteLater()
 
         for stepId, step in enumerate(loadedFlow.flow, start=0):
-            print(f"instance: {stepId}")
-
             if stepId == loadedFlow.flow.__len__() - 1:
                 self.flow.layout.addWidget(FlowStep(step.name, step.icon, stepId))
             else:
@@ -77,7 +75,7 @@ class FlowCreator(QWidget):
         self.updateFlow(self.loadedFlow)
     
     def removeFlowStep(self):
-        self.loadedFlow.deleteStep()
+        self.loadedFlow.deleteStep(self.flow.selectedStep)
         self.updateFlow(self.loadedFlow)
     
     def openExportWindow(self):

@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyleOption, QStyle
 from src.main.resource import Resource
-from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen
+from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen, QFont
 from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
+import textwrap
 
 class FlowStep(QWidget):
     clicked = pyqtSignal(int)
@@ -27,16 +28,23 @@ class FlowStep(QWidget):
 
         self.flowImg = QLabel()
         self.flowImg.setPixmap(self.curIcon.scaled(200, 200))
+        self.flowImg.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.flowImg.setStyleSheet('background-color: transparent;')
 
-        self.flowTxt = QLabel(self.curName)
-        self.flowTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.flowTxt = QLabel()
+        self.flowTxt.setWordWrap(True)
+        self.flowTxt.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+        self.flowTxt.setFont(QFont('Roboto', 35))
+        self.flowTxt.setFixedWidth(200)
+        self.flowTxt.font().setBold(True)
         self.flowTxt.setStyleSheet('''
-            font-size: 50px;
+            font-size: 25px;
             background-color: transparent;                       
         ''')
+        self.updateText()
 
         self.contentLayout = QVBoxLayout(self.content)
+        self.layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
         self.contentLayout.addWidget(self.flowImg)
         self.contentLayout.addWidget(self.flowTxt)
 
@@ -54,13 +62,18 @@ class FlowStep(QWidget):
         
         self.arrow.setPixmap(self.arrowImg)
         self.layout.addWidget(self.arrow)
+
+        self.content.resize(270, 0)
     
     def setSelected(self, selected):
         self.selected = selected
 
     def setName(self, name):
         self.curName = name
-        self.flowTxt.setText(name)
+        self.updateText()
+    
+    def updateText(self):
+        self.flowTxt.setText(textwrap.fill(self.curName, 20))
     
     def generateImage(self):
         wasSelected = False
@@ -100,7 +113,7 @@ class FlowStep(QWidget):
 
         self.flowImg.setPixmap(self.curIcon.scaled(int(200*scale), int(200*scale)))
         self.flowTxt.setStyleSheet(f'''
-            font-size: {int(50*scale)}px;
+            font-size: {int(35*scale)}px;
         ''')
 
         self.layout.setSpacing(int(50*scale))

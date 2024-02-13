@@ -9,9 +9,8 @@ class Flow:
         defaultIcon = Resource.resource_path('assets/defaultIcon.png')
         self.flow.append(Step("default", QPixmap(defaultIcon)))
     
-    def deleteStep(self):
-        if self.flow.__len__() > 0:
-            self.flow.pop(self.flow.__len__() - 1)
+    def deleteStep(self, index):
+        self.flow.pop(index)
 
 class Step:
     def __init__(self, name, icon):
