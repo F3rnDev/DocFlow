@@ -14,60 +14,60 @@ class FlowStep(QWidget):
         self.id = id
         self.selected = False
 
-        self.defaultArrowIcon = Resource.resource_path('assets/nextFlowStep.png')
+        self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right', color='#174077').pixmap(150, 150)
 
         self.curIcon = icon
         self.curName = name
         self.hasStep = False
 
         self.layout = QHBoxLayout(self)
-        self.layout.setSpacing(50)
 
         self.content = QWidget(self)
         self.content.setGeometry(QRect(0, 0, 800, 800))
         self.content.setStyleSheet('background-color: transparent;')
 
         self.flowImg = QLabel()
-        self.flowImg.setPixmap(qtawesome.icon('fa5b.youtube', color='black').pixmap(150, 150))
-
+        self.flowImg.setPixmap(qtawesome.icon('fa5s.cog', color='#174077').pixmap(150, 150))
         self.flowImg.setFixedSize(200, 200)
         self.flowImg.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.flowImg.setStyleSheet('''background-color: white;
-                                    border-radius: 10px;
-                                    border: 5px solid black;
+                                    border-radius: 20px;
+                                    border: 5px solid #174077;
                                    ''')
 
         self.flowTxt = QLabel()
         self.flowTxt.setWordWrap(True)
         self.flowTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.flowTxt.setFont(QFont('Roboto', 35))
-        self.flowTxt.setFixedWidth(200)
-        self.flowTxt.font().setBold(True)
+        self.flowTxt.setFixedWidth(270)
         self.flowTxt.setStyleSheet('''
-            font-size: 25px;
-            background-color: transparent;                       
+            font-size: 35px;
+            background-color: transparent;
+            color: #174077;
+            font-family: Roboto, sans-serif; 
+            font-weight: bold;                                              
         ''')
         self.updateText()
 
         self.contentLayout = QVBoxLayout(self.content)
         self.layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
-        self.contentLayout.addWidget(self.flowImg)
-        self.contentLayout.addWidget(self.flowTxt)
+        self.contentLayout.setSpacing(20)
+        self.contentLayout.addWidget(self.flowImg, 0, Qt.AlignmentFlag.AlignCenter)
+        self.contentLayout.addWidget(self.flowTxt, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
 
         self.layout.addWidget(self.content)
 
         self.arrow = QLabel()
         self.arrow.setStyleSheet('background-color: transparent;')
 
-        self.arrowImg = QPixmap(100, 100)
+        self.arrowImg = QPixmap(150, 150)
         self.arrowImg.fill(Qt.GlobalColor.transparent)
 
         if hasStep:
-            self.arrowImg = QPixmap(self.defaultArrowIcon).scaled(100, 100)
+            self.arrowImg = QPixmap(self.defaultArrowIcon)
             self.hasStep = True
         
         self.arrow.setPixmap(self.arrowImg)
-        self.layout.addWidget(self.arrow)
+        self.layout.addWidget(self.arrow, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
 
         self.content.resize(270, 0)
     
@@ -79,7 +79,7 @@ class FlowStep(QWidget):
         self.updateText()
     
     def updateText(self):
-        self.flowTxt.setText(textwrap.fill(self.curName, 20))
+        self.flowTxt.setText(textwrap.fill(self.curName, 14))
     
     def generateImage(self):
         wasSelected = False
