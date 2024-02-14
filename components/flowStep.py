@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyleOpt
 from src.main.resource import Resource
 from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen, QFont
 from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
+import qtawesome
 import textwrap
 
 class FlowStep(QWidget):
@@ -27,13 +28,18 @@ class FlowStep(QWidget):
         self.content.setStyleSheet('background-color: transparent;')
 
         self.flowImg = QLabel()
-        self.flowImg.setPixmap(self.curIcon.scaled(200, 200))
+        self.flowImg.setPixmap(qtawesome.icon('fa5b.youtube', color='black').pixmap(150, 150))
+
+        self.flowImg.setFixedSize(200, 200)
         self.flowImg.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.flowImg.setStyleSheet('background-color: transparent;')
+        self.flowImg.setStyleSheet('''background-color: white;
+                                    border-radius: 10px;
+                                    border: 5px solid black;
+                                   ''')
 
         self.flowTxt = QLabel()
         self.flowTxt.setWordWrap(True)
-        self.flowTxt.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+        self.flowTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.flowTxt.setFont(QFont('Roboto', 35))
         self.flowTxt.setFixedWidth(200)
         self.flowTxt.font().setBold(True)
@@ -112,9 +118,11 @@ class FlowStep(QWidget):
         self.setStyleSheet('background-color: transparent;')
 
         self.flowImg.setPixmap(self.curIcon.scaled(int(200*scale), int(200*scale)))
+
         self.flowTxt.setStyleSheet(f'''
-            font-size: {int(35*scale)}px;
+            font-size: {int(25*scale)}px;
         ''')
+        self.flowTxt.setFixedWidth(int(200*scale))
 
         self.layout.setSpacing(int(50*scale))
 

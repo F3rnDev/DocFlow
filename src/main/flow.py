@@ -10,7 +10,10 @@ class Flow:
         self.flow.append(Step("default", QPixmap(defaultIcon)))
     
     def deleteStep(self, index):
-        self.flow.pop(index)
+        if index < self.flow.__len__():
+            self.flow.pop(index)
+        else:
+            print('Index out of range')
 
 class Step:
     def __init__(self, name, icon):
