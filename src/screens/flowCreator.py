@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit
 from components.flowCanvas import FlowCanvas
-from components.flowStep import FlowStep
 from src.main.flow import Flow
+from components.window import Window
 
 class FlowCreator(QWidget):
     loadedFlow = Flow()
@@ -34,28 +34,10 @@ class FlowCreator(QWidget):
         self.stepName.setGeometry(1200, 20, 200, 50)
         self.stepName.setPlaceholderText('Nome da Etapa')
         self.stepName.textEdited.connect(self.updateStepInfo)
-    
-    def updateFlow(self, loadedFlow):
-        while self.flow.layout.count():
-            item = self.flow.layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.setParent(None)
-                widget.deleteLater()
 
-        for stepId, step in enumerate(loadedFlow.flow, start=0):
-            if stepId == loadedFlow.flow.__len__() - 1:
-                self.flow.layout.addWidget(FlowStep(step.name, step.icon, stepId))
-            else:
-                self.flow.layout.addWidget(FlowStep(step.name, step.icon, stepId, True))
-            
-            self.flow.layout.itemAt(stepId).widget().clicked.connect(self.flow.onStepClick)
-        
-        if self.loadedFlow.flow.__len__() > 0 and self.flow.selectedStep < self.loadedFlow.flow.__len__():
-            self.flow.layout.itemAt(self.flow.selectedStep).widget().setSelected(True)
-            self.loadStepInfo(self.flow.selectedStep)
-        else:
-            self.loadStepInfo(None)
+        self.iconBttn = QPushButton('Icone', self)
+        self.iconBttn.setGeometry(1400, 20, 200, 50)
+        self.iconBttn.clicked.connect(self.openIconPicker)
     
     def loadStepInfo(self, stepId: int):
         if stepId == None:
@@ -72,11 +54,14 @@ class FlowCreator(QWidget):
     
     def addFlowStep(self):
         self.loadedFlow.addStep()
-        self.updateFlow(self.loadedFlow)
+        self.flow.updateFlow(self.loadedFlow)
     
     def removeFlowStep(self):
         self.loadedFlow.deleteStep(self.flow.selectedStep)
-        self.updateFlow(self.loadedFlow)
+        self.flow.updateFlow(self.loadedFlow)
+    
+    def openIconPicker(self):
+        iconWindow = Window()
     
     def openExportWindow(self):
         docFile = None
