@@ -4,6 +4,12 @@ from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen, QFont
 from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
 import qtawesome
 import textwrap
+from enum import Enum
+
+class FlowStatus(Enum):
+    NOT_STARTED = 0
+    IN_PROGRESS = 1
+    DONE = 2
 
 class FlowStep(QWidget):
     clicked = pyqtSignal(int)
@@ -14,20 +20,17 @@ class FlowStep(QWidget):
         self.id = id
         self.selected = False
         self.curIcon = icon
-        self.hasStep = False
+        self.hasStep = hasStep
 
-        self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right', color='#174077')
-
-        self.layout = QGridLayout(self)
+        self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right')
 
         self.flowImg = QLabel()
-        self.flowImg.setPixmap(self.curIcon.pixmap(150, 150))
         self.flowImg.setFixedSize(200, 200)
         self.flowImg.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.flowImg.setStyleSheet('''
             background-color: white;
             border-radius: 30px;
-            border: 5px solid #174077;
+            border: 5px solid;
         ''')
 
         self.flowTxt = QLabel()
@@ -37,23 +40,16 @@ class FlowStep(QWidget):
         self.flowTxt.setStyleSheet('''
             font-size: 32px;
             background-color: transparent;
-            color: #174077;
             font-family: Roboto, sans-serif; 
             font-weight: bold;                                              
         ''')
         self.setName(name)
 
         self.arrow = QLabel()
-
         self.arrowImg = QPixmap(150, 150)
         self.arrowImg.fill(Qt.GlobalColor.transparent)
 
-        if hasStep:
-            self.arrowImg = QPixmap(self.defaultArrowIcon.pixmap(150, 150))
-            self.hasStep = True
-        
-        self.arrow.setPixmap(self.arrowImg)
-
+        self.layout = QGridLayout(self)
         self.layout.addWidget(self.arrow, 0, 1, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.layout.addWidget(self.flowImg, 0, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         self.layout.addWidget(self.flowTxt, 1, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
@@ -62,6 +58,8 @@ class FlowStep(QWidget):
 
         self.layout.setHorizontalSpacing(0)
         self.layout.setVerticalSpacing(20)
+
+        self.setStyle(FlowStatus.IN_PROGRESS)
     
     def setSelected(self, selected):
         self.selected = selected
@@ -69,6 +67,39 @@ class FlowStep(QWidget):
     def setName(self, name):
         self.curName = name
         self.flowTxt.setText(textwrap.fill(self.curName))
+    
+    def setStyle(self, curStatus):
+        arrowColor = ''
+        iconColor = ''
+
+        match curStatus:
+            case FlowStatus.NOT_STARTED:
+                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #aeabab;')
+                self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #aeabab;')
+                arrowColor = '#aeabab'
+                iconColor = '#8497B0'
+
+            case FlowStatus.IN_PROGRESS:
+                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #2F5597;')
+                self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #2F5597;')
+                arrowColor = '#2F5597'
+                iconColor = '#2F5597'
+            
+            case FlowStatus.DONE:
+                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #2F5597; background-color: #2F5597;')
+                self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #2F5597;')
+                arrowColor = '#2F5597'
+                iconColor = 'white'
+            
+        if self.hasStep:
+            self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right', color=arrowColor)
+            self.arrowImg = QPixmap(self.defaultArrowIcon.pixmap(150, 150))
+    
+        self.arrow.setPixmap(self.arrowImg)
+
+        icon = qtawesome.icon(self.curIcon, color=iconColor)
+        self.flowImg.setPixmap(icon.pixmap(150, 150))
+
     
     def generateImage(self):
         wasSelected = False

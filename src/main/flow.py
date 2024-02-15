@@ -6,8 +6,7 @@ class Flow:
         self.flow = []
     
     def addStep(self):
-        defaultIcon = qtawesome.icon('fa5s.cog', color='#174077')
-        self.flow.append(Step("default", defaultIcon))
+        self.flow.append(Step("default", 'fa5s.cog'))
     
     def deleteStep(self, index):
         if index < self.flow.__len__():
@@ -24,6 +23,5 @@ class Step:
         self.name = name
     
     def setIcon(self, icon):
-        newIcon = qtawesome.icon(icon, color='#174077')
-        self.icon = newIcon
+        self.icon = icon
         
