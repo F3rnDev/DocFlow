@@ -1,3 +1,5 @@
+#Part of the code was taken from python-qtawesome repository: https://github.com/spyder-ide/qtawesome/blob/master/qtawesome/icon_browser.py
+
 from PyQt6.QtWidgets import QWidget, QListWidget, QListWidgetItem, QPushButton, QLineEdit
 from PyQt6.QtCore import pyqtSignal
 import qtawesome
@@ -20,7 +22,7 @@ class IconSelector(QWidget):
                 self.iconNames.append('%s.%s' % (fontCollection, iconName))
             
         for iconName in self.iconNames:
-            item = QListWidgetItem(iconName)
+            item = QListWidgetItem(iconName.split('.')[1])
             item.setIcon(qtawesome.icon(iconName, color='black'))
             self.list_widget.addItem(item)
 
@@ -38,8 +40,10 @@ class IconSelector(QWidget):
         searchBar.textChanged.connect(self.searchIcon)
 
     def confirmIcon(self):
-        self.selectItem.emit(self.list_widget.currentItem().text())
-        self.closeWindow()
+        for iconName in self.iconNames:
+            if self.list_widget.currentItem().text() == iconName.split('.')[1]:
+                self.selectItem.emit(iconName)
+                self.closeWindow()
     
     def closeWindow(self):
         self.parent().closeWindow()
