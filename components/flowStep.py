@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyleOption, QStyle
+from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyleOption, QStyle, QGridLayout
 from src.main.resource import Resource
 from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen, QFont
 from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
@@ -18,11 +18,7 @@ class FlowStep(QWidget):
 
         self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right', color='#174077')
 
-        self.layout = QHBoxLayout(self)
-
-        self.content = QWidget(self)
-        self.content.setGeometry(QRect(0, 0, 800, 800))
-        self.content.setStyleSheet('background-color: transparent;')
+        self.layout = QGridLayout(self)
 
         self.flowImg = QLabel()
         self.flowImg.setPixmap(self.curIcon.pixmap(150, 150))
@@ -47,14 +43,6 @@ class FlowStep(QWidget):
         ''')
         self.setName(name)
 
-        self.contentLayout = QVBoxLayout(self.content)
-        self.contentLayout.setSpacing(20)
-        self.contentLayout.addWidget(self.flowImg, 0, Qt.AlignmentFlag.AlignCenter)
-        self.contentLayout.addWidget(self.flowTxt, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
-
-        self.layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
-        self.layout.addWidget(self.content)
-
         self.arrow = QLabel()
 
         self.arrowImg = QPixmap(150, 150)
@@ -65,7 +53,15 @@ class FlowStep(QWidget):
             self.hasStep = True
         
         self.arrow.setPixmap(self.arrowImg)
-        self.layout.addWidget(self.arrow, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+        self.layout.addWidget(self.arrow, 0, 1, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.layout.addWidget(self.flowImg, 0, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+        self.layout.addWidget(self.flowTxt, 1, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+
+        self.layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
+
+        self.layout.setHorizontalSpacing(0)
+        self.layout.setVerticalSpacing(20)
     
     def setSelected(self, selected):
         self.selected = selected
@@ -127,7 +123,7 @@ class FlowStep(QWidget):
             font-weight: bold;                                              
         ''')
 
-        self.contentLayout.setSpacing(int(20*scale))
+        self.layout.setVerticalSpacing(int(20*scale))
 
         if self.hasStep:
             self.arrowImg = self.defaultArrowIcon.pixmap(int(150*scale), int(150*scale))
