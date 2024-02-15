@@ -24,5 +24,6 @@ class Step:
         self.name = name
     
     def setIcon(self, icon):
-        self.icon = icon
+        newIcon = qtawesome.icon(icon, color='#174077')
+        self.icon = newIcon
         

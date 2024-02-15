@@ -1,7 +1,10 @@
+from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit
+from PyQt6.QtCore import QCoreApplication
 from components.flowCanvas import FlowCanvas
 from src.main.flow import Flow
 from components.window import Window
+from src.main.screenManager import ScreenManager as manager
 
 class FlowCreator(QWidget):
     loadedFlow = Flow()
@@ -36,15 +39,18 @@ class FlowCreator(QWidget):
         self.stepName.textEdited.connect(self.updateStepInfo)
 
         self.iconBttn = QPushButton('Icone', self)
+        self.iconBttn.setDisabled(True)
         self.iconBttn.setGeometry(1400, 20, 200, 50)
         self.iconBttn.clicked.connect(self.openIconPicker)
     
     def loadStepInfo(self, stepId: int):
         if stepId == None:
             self.stepName.setDisabled(True)
+            self.iconBttn.setDisabled(True)
             self.stepName.setText('')
         else:
             self.stepName.setDisabled(False)
+            self.iconBttn.setDisabled(False)
             self.stepName.setText(self.loadedFlow.flow[stepId].name)
     
     def updateStepInfo(self):
@@ -61,7 +67,13 @@ class FlowCreator(QWidget):
         self.flow.updateFlow(self.loadedFlow)
     
     def openIconPicker(self):
-        iconWindow = Window()
+        self.iconWindow = Window(manager().getScreen("IconSelector"), "Selecione um ícone", 700, 700, True)
+        self.iconWindow.show()
+        self.iconWindow.content.selectItem.connect(self.updateStepIcon)
+    
+    def updateStepIcon(self, icon: str):
+        self.loadedFlow.flow[self.flow.selectedStep].setIcon(icon)
+        self.flow.updateFlow(self.loadedFlow)
     
     def openExportWindow(self):
         docFile = None
@@ -71,4 +83,8 @@ class FlowCreator(QWidget):
         
         if docFile:
             self.flow.exportImages(docFile)
+    
+    def closeEvent(self, a0: QCloseEvent | None) -> None:
+        QCoreApplication.quit()
+        QCoreApplication.exit()
 
