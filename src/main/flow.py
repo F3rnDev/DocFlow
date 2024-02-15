@@ -1,13 +1,13 @@
 from PyQt6.QtGui import QPixmap
-from src.main.resource import Resource
+import qtawesome
 
 class Flow:
     def __init__(self):
         self.flow = []
     
     def addStep(self):
-        defaultIcon = Resource.resource_path('assets/defaultIcon.png')
-        self.flow.append(Step("default", QPixmap(defaultIcon)))
+        defaultIcon = qtawesome.icon('fa5s.cog', color='#174077')
+        self.flow.append(Step("default", defaultIcon))
     
     def deleteStep(self, index):
         if index < self.flow.__len__():

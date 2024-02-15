@@ -33,7 +33,7 @@ class FlowCreator(QWidget):
         self.stepName.setDisabled(True)
         self.stepName.setGeometry(1200, 20, 200, 50)
         self.stepName.setPlaceholderText('Nome da Etapa')
-        self.stepName.textChanged.connect(self.updateStepInfo)
+        self.stepName.textEdited.connect(self.updateStepInfo)
     
     def updateFlow(self, loadedFlow):
         while self.flow.layout.count():
