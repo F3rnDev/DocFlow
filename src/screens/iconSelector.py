@@ -22,7 +22,7 @@ class IconSelector(QWidget):
                 self.iconNames.append('%s.%s' % (fontCollection, iconName))
             
         for iconName in self.iconNames:
-            item = QListWidgetItem(iconName.split('.')[1])
+            item = QListWidgetItem(iconName)
             item.setIcon(qtawesome.icon(iconName, color='black'))
             self.list_widget.addItem(item)
 
@@ -40,10 +40,9 @@ class IconSelector(QWidget):
         searchBar.textChanged.connect(self.searchIcon)
 
     def confirmIcon(self):
-        for iconName in self.iconNames:
-            if self.list_widget.currentItem().text() == iconName.split('.')[1]:
-                self.selectItem.emit(iconName)
-                self.closeWindow()
+        if self.list_widget.currentItem() is not None:
+            self.selectItem.emit(self.list_widget.currentItem().text())
+            self.closeWindow()
     
     def closeWindow(self):
         self.parent().closeWindow()

@@ -1,6 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QStyleOption, QStyle, QGridLayout
-from src.main.resource import Resource
-from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen, QFont
+from PyQt6.QtWidgets import QWidget, QLabel, QStyleOption, QStyle, QGridLayout
+from PyQt6.QtGui import QEnterEvent, QMouseEvent, QPixmap, QPainter, QPen
 from PyQt6.QtCore import QRect, QSize, Qt, pyqtSignal
 import qtawesome
 import textwrap
@@ -21,6 +20,7 @@ class FlowStep(QWidget):
         self.selected = False
         self.curIcon = icon
         self.hasStep = hasStep
+        self.defaultSize = None #set default size to None, then check if it's None to set the default size :)
 
         self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right')
 
@@ -50,17 +50,15 @@ class FlowStep(QWidget):
         self.arrowImg.fill(Qt.GlobalColor.transparent)
 
         self.layout = QGridLayout(self)
-        self.layout.addWidget(self.arrow, 0, 1, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.layout.addWidget(self.arrow, 0, 1, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.layout.addWidget(self.flowImg, 0, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         self.layout.addWidget(self.flowTxt, 1, 0, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
-
-        self.layout.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
 
         self.layout.setHorizontalSpacing(0)
         self.layout.setVerticalSpacing(20)
 
-        self.setStyle(FlowStatus.IN_PROGRESS)
-    
+        self.setStatus(FlowStatus.DONE)
+        
     def setSelected(self, selected):
         self.selected = selected
 
@@ -68,28 +66,28 @@ class FlowStep(QWidget):
         self.curName = name
         self.flowTxt.setText(textwrap.fill(self.curName))
     
-    def setStyle(self, curStatus):
+    def setStatus(self, curStatus):
         arrowColor = ''
         iconColor = ''
 
         match curStatus:
             case FlowStatus.NOT_STARTED:
-                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #aeabab;')
+                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #aeabab; background-color: white;')
                 self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #aeabab;')
                 arrowColor = '#aeabab'
                 iconColor = '#8497B0'
-
-            case FlowStatus.IN_PROGRESS:
-                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #2F5597;')
-                self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #2F5597;')
-                arrowColor = '#2F5597'
-                iconColor = '#2F5597'
             
-            case FlowStatus.DONE:
+            case FlowStatus.IN_PROGRESS:
                 self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #2F5597; background-color: #2F5597;')
                 self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #2F5597;')
                 arrowColor = '#2F5597'
                 iconColor = 'white'
+            
+            case FlowStatus.DONE:
+                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #2F5597; background-color: white;')
+                self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #2F5597;')
+                arrowColor = '#2F5597'
+                iconColor = '#2F5597'
             
         if self.hasStep:
             self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right', color=arrowColor)
@@ -97,8 +95,8 @@ class FlowStep(QWidget):
     
         self.arrow.setPixmap(self.arrowImg)
 
-        icon = qtawesome.icon(self.curIcon, color=iconColor)
-        self.flowImg.setPixmap(icon.pixmap(150, 150))
+        self.icon = qtawesome.icon(self.curIcon, color=iconColor)
+        self.flowImg.setPixmap(self.icon.pixmap(150, 150))
 
     
     def generateImage(self):
@@ -116,6 +114,9 @@ class FlowStep(QWidget):
         # scale = min(scale_width, scale_height)
 
         scale = 1.5
+
+        if self.defaultSize == None:
+            self.defaultSize = self.size()
 
         self.resizeWidget(scale)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -136,22 +137,19 @@ class FlowStep(QWidget):
 
     def resizeWidget(self, scale):
         self.setStyleSheet('background-color: transparent;')
-
-        self.flowImg.setPixmap(self.curIcon.pixmap(int(150*scale), int(150*scale)))
+    
+        self.flowImg.setPixmap(self.icon.pixmap(int(150*scale), int(150*scale)))
         self.flowImg.setFixedSize(int(200*scale), int(200*scale))
         self.flowImg.setStyleSheet(f'''
-            background-color: white;
+            {self.flowImg.styleSheet()}
             border-radius: {int(30*scale)}px;
-            border: {int(5*scale)}px solid #174077;
+            border-width: {int(5*scale)}px;
         ''')
 
         self.flowTxt.setFixedWidth(int(270*scale))
         self.flowTxt.setStyleSheet(f'''
-            font-size: {int(32*scale)}px;
-            background-color: transparent;
-            color: #174077;
-            font-family: Roboto, sans-serif; 
-            font-weight: bold;                                              
+            {self.flowTxt.styleSheet()}
+            font-size: {int(32*scale)}px;                                             
         ''')
 
         self.layout.setVerticalSpacing(int(20*scale))
@@ -163,7 +161,7 @@ class FlowStep(QWidget):
             self.arrowImg = QPixmap(150, 150)
             self.arrowImg.fill(Qt.GlobalColor.transparent)
         
-        self.resize(((self.size() * scale)) + QSize(self.layout.spacing(), 0))
+        self.resize(((self.defaultSize * scale)) + QSize(self.layout.spacing(), 0))
     
     def paintEvent(self, pe):
         o = QStyleOption()

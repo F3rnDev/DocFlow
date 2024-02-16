@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QApplication, QHBoxLayout, QStyleOption, QStyle
 from PyQt6.QtGui import QMouseEvent, QPainter
 from PyQt6.QtCore import QRect, QPoint, Qt
-from components.flowStep import FlowStep
+from components.flowStep import FlowStep, FlowStatus
 from PIL import Image
 import os
 
@@ -38,12 +38,17 @@ class FlowCanvas(QWidget):
 
         for i in range(self.layout.count()):
             step = self.layout.itemAt(i).widget()
-
             if isinstance(step, FlowStep):
-                img = Image.fromqpixmap(step.generateImage())
-                img.save(os.path.join(flowFolder, f'flowStep{i}.png'))
+                self.saveImg(step, i, flowFolder)
+    
+    def saveImg(self, widget, i, path):
+        for status in FlowStatus:
+            widget.setStatus(status)
+            img = Image.fromqpixmap(widget.generateImage())
+            img.save(os.path.join(path, f'flowStep{i}_{status.name}.png'))
 
-                print(img.size)
+            print(img.size)
+        
     
     def paintEvent(self, pe):
         o = QStyleOption()
