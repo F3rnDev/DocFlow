@@ -1,13 +1,13 @@
 from PyQt6.QtGui import QCloseEvent
-from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit
+from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit, QLabel
 from PyQt6.QtCore import QCoreApplication
 from components.flowCanvas import FlowCanvas
-from src.main.flow import Flow
+from src.main.project import Project
 from components.window import Window
 from src.main.screenManager import ScreenManager as manager
 
 class FlowCreator(QWidget):
-    loadedFlow = Flow()
+    project = Project()
 
     def __init__(self):
         super().__init__()
@@ -16,9 +16,28 @@ class FlowCreator(QWidget):
     def setup(self):
         self.flow = FlowCanvas(self)
 
+        self.displayName = QLabel(self.project.name, self)
+        self.displayName.setGeometry(100, 150, 200, 50)
+
         addFlowBtn = QPushButton('Adicionar Etapa', self)
         addFlowBtn.setGeometry(100, 20, 200, 50)
         addFlowBtn.clicked.connect(self.addFlowStep)
+
+        newProjectBtn = QPushButton('Novo Projeto', self)
+        newProjectBtn.setGeometry(100, 80, 200, 50)
+        newProjectBtn.clicked.connect(self.newProject)
+        
+        saveFlowBtn = QPushButton('Salvar Fluxo', self)
+        saveFlowBtn.setGeometry(300, 80, 200, 50)
+        saveFlowBtn.clicked.connect(self.saveFlow)
+
+        openFlowBtn = QPushButton('Abrir Fluxo', self)
+        openFlowBtn.setGeometry(700, 80, 200, 50)
+        openFlowBtn.clicked.connect(self.openFlow)
+
+        saveAsFlowBtn = QPushButton('Salvar Como', self)
+        saveAsFlowBtn.setGeometry(500, 80, 200, 50)
+        saveAsFlowBtn.clicked.connect(self.saveAsFlow)
 
         removeFlowBtn = QPushButton('Remover Etapa', self)
         removeFlowBtn.setGeometry(300, 20, 200, 50)
@@ -51,20 +70,38 @@ class FlowCreator(QWidget):
         else:
             self.stepName.setDisabled(False)
             self.iconBttn.setDisabled(False)
-            self.stepName.setText(self.loadedFlow.flow[stepId].name)
+            self.stepName.setText(self.project.getFlow()[stepId].name)
     
     def updateStepInfo(self):
-        if self.loadedFlow.flow.__len__() > 0 and self.flow.selectedStep < self.loadedFlow.flow.__len__():
-            self.loadedFlow.flow[self.flow.selectedStep].setName(self.stepName.text())
+        if self.project.getFlow().__len__() > 0 and self.flow.selectedStep < self.project.getFlow().__len__():
+            self.project.getFlow()[self.flow.selectedStep].setName(self.stepName.text())
             self.flow.layout.itemAt(self.flow.selectedStep).widget().setName(self.stepName.text())
     
     def addFlowStep(self):
-        self.loadedFlow.addStep()
-        self.flow.updateFlow(self.loadedFlow)
+        self.project.flow.addStep()
+        self.flow.updateFlow(self.project.getFlow())
     
     def removeFlowStep(self):
-        self.loadedFlow.deleteStep(self.flow.selectedStep)
-        self.flow.updateFlow(self.loadedFlow)
+        self.project.flow.deleteStep(self.flow.selectedStep)
+        self.flow.updateFlow(self.project.getFlow())
+    
+    def openFlow(self):
+        self.project.open()
+        self.flow.updateFlow(self.project.getFlow())
+        self.displayName.setText(self.project.name)
+    
+    def saveFlow(self):
+        self.project.saveControl()
+        self.displayName.setText(self.project.name)
+    
+    def saveAsFlow(self):
+        self.project.saveAs()
+        self.displayName.setText(self.project.name)
+    
+    def newProject(self):
+        self.project.new()
+        self.flow.updateFlow(self.project.getFlow())
+        self.displayName.setText(self.project.name)
     
     def openIconPicker(self):
         self.iconWindow = Window(manager().getScreen("IconSelector"), "Selecione um ícone", 700, 700, True)
@@ -72,19 +109,14 @@ class FlowCreator(QWidget):
         self.iconWindow.content.selectItem.connect(self.updateStepIcon)
     
     def updateStepIcon(self, icon: str):
-        self.loadedFlow.flow[self.flow.selectedStep].setIcon(icon)
-        self.flow.updateFlow(self.loadedFlow)
+        self.project.getFlow()[self.flow.selectedStep].setIcon(icon)
+        self.flow.updateFlow(self.project.getFlow())
     
     def openExportWindow(self):
         docFile = None
 
-        if self.loadedFlow.flow.__len__() > 0:
+        if self.project.getFlow().__len__() > 0:
             docFile = QFileDialog.getExistingDirectory(self, 'Selecione a pasta para exportar as imagens')
         
         if docFile:
             self.flow.exportImages(docFile)
-    
-    def closeEvent(self, a0: QCloseEvent | None) -> None:
-        QCoreApplication.quit()
-        QCoreApplication.exit()
-

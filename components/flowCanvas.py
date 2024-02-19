@@ -30,7 +30,7 @@ class FlowCanvas(QWidget):
     
     def onStepClick(self, id):
         self.selectedStep = id
-        self.updateFlow(self.parent().loadedFlow)
+        self.updateFlow(self.parent().project.getFlow())
 
     def exportImages(self, path):
         flowFolder = os.path.join(path, 'flow_images')
@@ -57,7 +57,7 @@ class FlowCanvas(QWidget):
         self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, o, p, self)
     
 
-    def updateFlow(self, loadedFlow):
+    def updateFlow(self, flow):
         while self.layout.count():
             item = self.layout.takeAt(0)
             widget = item.widget()
@@ -65,18 +65,18 @@ class FlowCanvas(QWidget):
                 widget.setParent(None)
                 widget.deleteLater()
 
-        for stepId, step in enumerate(loadedFlow.flow, start=0):
-            self.addFlowStep(stepId, step, loadedFlow)      
+        for stepId, step in enumerate(flow, start=0):
+            self.addFlowStep(stepId, step, flow)      
             self.layout.itemAt(stepId).widget().clicked.connect(self.onStepClick)
         
-        if loadedFlow.flow.__len__() > 0 and self.selectedStep < loadedFlow.flow.__len__():
+        if flow.__len__() > 0 and self.selectedStep < flow.__len__():
             self.layout.itemAt(self.selectedStep).widget().setSelected(True)
             self.parent().loadStepInfo(self.selectedStep)
         else:
             self.parent().loadStepInfo(None)
     
-    def addFlowStep(self, stepId, step, loadedFlow):
-        if stepId == loadedFlow.flow.__len__() - 1:
+    def addFlowStep(self, stepId, step, flow):
+        if stepId == flow.__len__() - 1:
             self.layout.addWidget(FlowStep(step.name, step.icon, stepId))
         else:
             self.layout.addWidget(FlowStep(step.name, step.icon, stepId, True))
