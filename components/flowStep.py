@@ -20,7 +20,7 @@ class FlowStep(QWidget):
         self.selected = False
         self.curIcon = icon
         self.hasStep = hasStep
-        self.defaultSize = None #set default size to None, then check if it's None to set the default size :)
+        self.defaultSize = None
 
         self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right')
 
@@ -106,17 +106,7 @@ class FlowStep(QWidget):
             wasSelected = True
             self.setSelected(False)
 
-        # desired_width = 700
-        # desired_height = 700
-
-        # scale_width = desired_width / self.width()
-        # scale_height = desired_height / self.height()
-        # scale = min(scale_width, scale_height)
-
         scale = 1.5
-
-        if self.defaultSize == None:
-            self.defaultSize = self.size()
 
         self.resizeWidget(scale)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -160,7 +150,7 @@ class FlowStep(QWidget):
         else:
             self.arrowImg = QPixmap(150, 150)
             self.arrowImg.fill(Qt.GlobalColor.transparent)
-        
+
         self.resize(((self.defaultSize * scale)) + QSize(self.layout.spacing(), 0))
     
     def paintEvent(self, pe):

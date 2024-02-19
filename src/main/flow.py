@@ -11,18 +11,18 @@ class Flow:
         else:
             print('Index out of range')
 
-    def exportFlow(self, name):
-        exportData = {"name": name, "flow": []}
+    def exportFlow(self):
+        flowData = []
 
         for step in self.steps:
-            exportData["flow"].append([step.name, step.icon])
+            flowData.append([step.name, step.icon])
         
-        return exportData
+        return flowData
 
     def importFlow(self, data):
         self.steps = []
 
-        for step in data["flow"]:
+        for step in data:
             self.steps.append(Step(step[0], step[1]))
 
 class Step:

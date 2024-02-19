@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QApplication, QHBoxLayout, QStyleOption, QStyle
 from PyQt6.QtGui import QMouseEvent, QPainter
-from PyQt6.QtCore import QRect, QPoint, Qt
+from PyQt6.QtCore import QRect, QPoint, Qt, QSize
 from components.flowStep import FlowStep, FlowStatus
+from src.main.language import allLanguages
 from PIL import Image
 import os
 
@@ -11,6 +12,7 @@ class FlowCanvas(QWidget):
         self.setGeometry(QRect(0, 0, 10000, 10000))
 
         self.selectedStep = 0
+        self.curLang = 0
 
         self.setStyleSheet('background-color: #ffffff;')
 
@@ -22,6 +24,10 @@ class FlowCanvas(QWidget):
 
         self.resetCanvasPosition()
     
+    def changeLanguage(self, lang):
+        self.curLang = lang
+        self.updateFlow(self.parent().project.getFlowSteps(self.curLang))
+    
     def resetCanvasPosition(self):
         screenGeometry = QApplication.primaryScreen().geometry()
         flowX = (screenGeometry.width() - self.width()) // 2
@@ -30,16 +36,41 @@ class FlowCanvas(QWidget):
     
     def onStepClick(self, id):
         self.selectedStep = id
-        self.updateFlow(self.parent().project.getFlow())
+        self.updateFlow(self.parent().project.getFlowSteps(self.curLang))
 
     def exportImages(self, path):
         flowFolder = os.path.join(path, 'flow_images')
         os.makedirs(flowFolder, exist_ok=True)
 
+        selectedLang = self.curLang
+
+        langIdx = 0
+        for language in self.parent().project.languages:
+            self.changeLanguage(langIdx)  
+            self.saveFlowImages(flowFolder, language)
+            langIdx += 1
+        
+        self.changeLanguage(selectedLang)
+    
+    def saveFlowImages(self, path, lang):
+        langFolder = os.path.join(path, lang.cur.value)
+        os.makedirs(langFolder, exist_ok=True)
+
         for i in range(self.layout.count()):
             step = self.layout.itemAt(i).widget()
+            step.defaultSize = self.setExportSize()
+
             if isinstance(step, FlowStep):
-                self.saveImg(step, i, flowFolder)
+                self.saveImg(step, i, langFolder)
+    
+    def setExportSize(self):
+        size = [0, 0]
+
+        for i in range(self.layout.count()):
+            step = self.layout.itemAt(i).widget()
+            size = [max(size[0], step.sizeHint().width()), max(size[1], step.sizeHint().height())]
+        
+        return QSize(size[0], size[1])
     
     def saveImg(self, widget, i, path):
         for status in FlowStatus:
@@ -47,7 +78,7 @@ class FlowCanvas(QWidget):
             img = Image.fromqpixmap(widget.generateImage())
             img.save(os.path.join(path, f'flowStep{i}_{status.name}.png'))
 
-            print(img.size)
+            print(f"{widget.flowTxt.text()}: {img.size}")
         
     
     def paintEvent(self, pe):

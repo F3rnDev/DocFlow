@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QCloseEvent
-from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit, QLabel
+from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit, QLabel, QComboBox
 from PyQt6.QtCore import QCoreApplication
 from components.flowCanvas import FlowCanvas
 from src.main.project import Project
@@ -61,6 +61,13 @@ class FlowCreator(QWidget):
         self.iconBttn.setDisabled(True)
         self.iconBttn.setGeometry(1400, 20, 200, 50)
         self.iconBttn.clicked.connect(self.openIconPicker)
+
+        self.languagePicker = QComboBox(self)
+        self.languagePicker.setGeometry(900, 20, 200, 50)
+        self.languagePicker.currentIndexChanged.connect(self.flow.changeLanguage)
+
+        for lang in self.project.languages:
+            self.languagePicker.addItem(lang.cur.name)
     
     def loadStepInfo(self, stepId: int):
         if stepId == None:
@@ -70,24 +77,24 @@ class FlowCreator(QWidget):
         else:
             self.stepName.setDisabled(False)
             self.iconBttn.setDisabled(False)
-            self.stepName.setText(self.project.getFlow()[stepId].name)
+            self.stepName.setText(self.project.getFlowSteps(self.flow.curLang)[stepId].name)
     
     def updateStepInfo(self):
-        if self.project.getFlow().__len__() > 0 and self.flow.selectedStep < self.project.getFlow().__len__():
-            self.project.getFlow()[self.flow.selectedStep].setName(self.stepName.text())
+        if self.project.getFlowSteps(self.flow.curLang).__len__() > 0 and self.flow.selectedStep < self.project.getFlowSteps(self.flow.curLang).__len__():
+            self.project.getFlowSteps(self.flow.curLang)[self.flow.selectedStep].setName(self.stepName.text())
             self.flow.layout.itemAt(self.flow.selectedStep).widget().setName(self.stepName.text())
     
     def addFlowStep(self):
-        self.project.flow.addStep()
-        self.flow.updateFlow(self.project.getFlow())
+        self.project.addSteps()
+        self.flow.updateFlow(self.project.getFlowSteps(self.flow.curLang))
     
     def removeFlowStep(self):
-        self.project.flow.deleteStep(self.flow.selectedStep)
-        self.flow.updateFlow(self.project.getFlow())
+        self.project.deleteSteps(self.flow.selectedStep)
+        self.flow.updateFlow(self.project.getFlowSteps(self.flow.curLang))
     
     def openFlow(self):
         self.project.open()
-        self.flow.updateFlow(self.project.getFlow())
+        self.flow.updateFlow(self.project.getFlowSteps(self.flow.curLang))
         self.displayName.setText(self.project.name)
     
     def saveFlow(self):
@@ -100,7 +107,7 @@ class FlowCreator(QWidget):
     
     def newProject(self):
         self.project.new()
-        self.flow.updateFlow(self.project.getFlow())
+        self.flow.updateFlow(self.project.getFlowSteps(self.flow.curLang))
         self.displayName.setText(self.project.name)
     
     def openIconPicker(self):
@@ -109,13 +116,14 @@ class FlowCreator(QWidget):
         self.iconWindow.content.selectItem.connect(self.updateStepIcon)
     
     def updateStepIcon(self, icon: str):
-        self.project.getFlow()[self.flow.selectedStep].setIcon(icon)
-        self.flow.updateFlow(self.project.getFlow())
+        self.project.setIcons(self.flow.selectedStep, icon)
+        self.project.getFlowSteps(self.flow.curLang)[self.flow.selectedStep].setIcon(icon)
+        self.flow.updateFlow(self.project.getFlowSteps(self.flow.curLang))
     
     def openExportWindow(self):
         docFile = None
 
-        if self.project.getFlow().__len__() > 0:
+        if self.project.getFlowSteps(self.flow.curLang).__len__() > 0:
             docFile = QFileDialog.getExistingDirectory(self, 'Selecione a pasta para exportar as imagens')
         
         if docFile:
