@@ -24,6 +24,16 @@ class FlowStep(QWidget):
 
         self.defaultArrowIcon = qtawesome.icon('mdi.chevron-triple-right')
 
+        self.setStyleSheet('''
+            QWidget {
+                background-color: transparent;
+            }
+
+            QWidget::hover {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+        ''')
+
         self.flowImg = QLabel()
         self.flowImg.setFixedSize(200, 200)
         self.flowImg.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -46,6 +56,7 @@ class FlowStep(QWidget):
         self.setName(name)
 
         self.arrow = QLabel()
+        self.arrow.setStyleSheet('background-color: transparent;')
         self.arrowImg = QPixmap(150, 150)
         self.arrowImg.fill(Qt.GlobalColor.transparent)
 
@@ -173,3 +184,9 @@ class FlowStep(QWidget):
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit(self.id)
+
+    def enterEvent(self, event):
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+    
+    def leaveEvent(self, event):
+        self.unsetCursor()

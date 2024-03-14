@@ -16,6 +16,10 @@ class Project:
         for language in allLanguages:
             self.languages.append(Language(language))
     
+    def setName(self, name):
+        self.name = name
+        print(self.name)
+    
     def addSteps(self):
         for language in self.languages:
             language.flow.addStep()
@@ -59,14 +63,13 @@ class Project:
             self.save(self.name, self.file)
     
     def save(self, saveName, filePath):
-        data = {"name": saveName}
+        data = {"name": self.name}
 
         for language in self.languages:
             data[language.cur.value] = language.flow.exportFlow()
 
         with open (filePath, 'w') as file:
             json.dump(data, file)
-            self.name = saveName
             self.file = filePath
     
     def saveAs(self):

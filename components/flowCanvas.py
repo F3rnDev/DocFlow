@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QApplication, QHBoxLayout, QStyleOption, QStyle
-from PyQt6.QtGui import QMouseEvent, QPainter
+from PyQt6.QtGui import QMouseEvent, QPainter, QPen
 from PyQt6.QtCore import QRect, QPoint, Qt, QSize
 from components.flowStep import FlowStep, FlowStatus
 from src.main.language import allLanguages
@@ -14,7 +14,7 @@ class FlowCanvas(QWidget):
         self.selectedStep = 0
         self.curLang = 0
 
-        self.setStyleSheet('background-color: #ffffff;')
+        self.setStyleSheet('background-color: #f0f0f0;')
 
         self.layout = QHBoxLayout(self)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -29,7 +29,7 @@ class FlowCanvas(QWidget):
         self.updateFlow(self.parent().project.getFlowSteps(self.curLang))
     
     def resetCanvasPosition(self):
-        screenGeometry = QApplication.primaryScreen().geometry()
+        screenGeometry = self.parent()
         flowX = (screenGeometry.width() - self.width()) // 2
         flowY = (screenGeometry.height() - self.height()) // 2
         self.move(flowX, flowY)
@@ -46,13 +46,13 @@ class FlowCanvas(QWidget):
 
         langIdx = 0
         for language in self.parent().project.languages:
-            self.changeLanguage(langIdx)  
-            self.saveFlowImages(flowFolder, language)
+            self.changeLanguage(langIdx)
+            self.exportCurLang(flowFolder, language)
             langIdx += 1
         
         self.changeLanguage(selectedLang)
     
-    def saveFlowImages(self, path, lang):
+    def exportCurLang(self, path, lang):
         langFolder = os.path.join(path, lang.cur.value)
         os.makedirs(langFolder, exist_ok=True)
 
@@ -86,6 +86,22 @@ class FlowCanvas(QWidget):
         o.initFrom(self)
         p = QPainter(self)
         self.style().drawPrimitive(QStyle.PrimitiveElement.PE_Widget, o, p, self)
+
+        pen = QPen(Qt.GlobalColor.black)
+        p.setPen(pen)
+
+        p.setOpacity(0.05)
+
+        # Tamanho da célula da grade
+        cell_size = 80
+
+        # Desenhar as linhas verticais
+        for i in range(0, self.width(), cell_size):
+            p.drawLine(i, 0, i, self.height())
+
+        # Desenhar as linhas horizontais
+        for j in range(0, self.height(), cell_size):
+            p.drawLine(0, j, self.width(), j)
     
 
     def updateFlow(self, flow):

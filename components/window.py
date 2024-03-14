@@ -1,4 +1,5 @@
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtWidgets import QWidget
 
 class Window(QWidget):
@@ -18,6 +19,9 @@ class Window(QWidget):
             self.closeWindow()
         else:
             super().keyPressEvent(e)
+    
+    def resizeEvent(self, a0: QResizeEvent | None) -> None:
+        self.content.resize(self.width(), self.height())
     
     def closeWindow(self):
         self.close()
