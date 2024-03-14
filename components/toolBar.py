@@ -1,4 +1,6 @@
+from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import *
+from PyQt6.QtGui import QEnterEvent
 from PyQt6.QtWidgets import *
 import qtawesome
 from PyQt6.QtCore import *
@@ -106,10 +108,6 @@ class toolBarBttn(QWidget):
                 border-radius: 5px;
                 text-align: center;
             }
-                                 
-            QWidget::hover {
-                background-color: #e0e0e0;
-            }
         ''')
 
         self.setToolTip(tooltip)
@@ -175,6 +173,26 @@ class toolBarBttn(QWidget):
             self.clicked.emit()
         else:
             super().mousePressEvent(event)
+    
+    def enterEvent(self, event: QEnterEvent | None) -> None:
+        self.setStyleSheet('''
+            QWidget {
+                background-color: #e0e0e0;
+                border: 0px;
+                border-radius: 5px;
+                text-align: center;
+            }
+        ''')
+    
+    def leaveEvent(self, a0: QEvent | None) -> None:
+        self.setStyleSheet('''
+            QWidget {
+                background-color: transparent;
+                border: 0px;
+                border-radius: 5px;
+                text-align: center;
+            }
+        ''')
     
     def paintEvent(self, pe):
         o = QStyleOption()

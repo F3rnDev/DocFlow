@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit, QLabel
 from PyQt6.QtCore import Qt
 from components.toolBar import ToolBarOptions
 from components.flowCanvas import FlowCanvas
+from components.sideBar import SideBar
 from src.main.project import Project
 from components.window import Window
 from src.main.screenManager import ScreenManager as manager
@@ -15,6 +16,8 @@ class FlowCreator(QWidget):
         self.setup()
 
     def setup(self):
+        self.setGeometry(0, 0, 1920, 1080)
+
         self.flow = FlowCanvas(self)
 
         #---------------------delete later---------------------
@@ -68,11 +71,11 @@ class FlowCreator(QWidget):
         # exportBtn.clicked.connect(self.openExportWindow)
         
         #---------------------END delete later---------------------
-        toolbar = QWidget(self)
-        toolbar.setGeometry(0, 0, 1920, 180)
+        self.toolbar = QWidget(self)
+        self.toolbar.setGeometry(0, 0, 1920, 180)
 
-        toolbarLayout = QVBoxLayout(self)
-        toolbar.setLayout(toolbarLayout)
+        toolbarLayout = QVBoxLayout(self.toolbar)
+        self.toolbar.setLayout(toolbarLayout)
         toolbarLayout.setContentsMargins(0, 0, 0, 0)
         toolbarLayout.setSpacing(0)
 
@@ -81,7 +84,7 @@ class FlowCreator(QWidget):
         self.proj.setStyleSheet(''' background-color: #ffffff; border: none;''')
         toolbarLayout.addWidget(self.proj)
 
-        projLayout = QHBoxLayout(self)
+        projLayout = QHBoxLayout(self.proj)
         self.proj.setLayout(projLayout)
         projLayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         projLayout.setContentsMargins(20, 10, 0, 0)
@@ -102,12 +105,16 @@ class FlowCreator(QWidget):
         self.toolBarOpt = ToolBarOptions(self)
         toolbarLayout.addWidget(self.toolBarOpt)
 
+        self.sideBar = SideBar(self)
+
         # self.stepInfoUI = StepFlowInfo(self)
         # toolbarLayout.addWidget(self.stepInfoUI)
     
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
-        self.toolBarOpt.resize(self.width(), 80)
+        self.toolbar.resize(self.width(), 180)
         self.flow.resetCanvasPosition()
+
+        self.sideBar.responsiveResize(self.width(), self.height(), self.toolbar.height())
     
     def loadStepInfo(self, stepId: int):
         if stepId == None:
@@ -159,6 +166,8 @@ class FlowCreator(QWidget):
         self.project.setIcons(self.flow.selectedStep, icon)
         self.project.getFlowSteps(self.flow.curLang)[self.flow.selectedStep].setIcon(icon)
         self.flow.updateFlow(self.project.getFlowSteps(self.flow.curLang))
+
+
     
     def openExportWindow(self):
         docFile = None
