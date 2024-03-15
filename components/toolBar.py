@@ -35,6 +35,10 @@ class ToolBarOptions(QWidget):
         addFlowBtn = toolBarBttn(self, 'fa5s.plus', 'Adicionar Etapa')
         addFlowBtn.clicked.connect(parent.addFlowStep)
         self.layout.addWidget(addFlowBtn)
+
+        removeFlowBtn = toolBarBttn(self, 'fa.remove', 'Remover Etapa')
+        removeFlowBtn.clicked.connect(parent.removeFlowStep)
+        self.layout.addWidget(removeFlowBtn)
     
     def addSaveOptions(self, parent):
         fileOptions = [['Novo Projeto', 'fa5s.file', parent.newProject, True], 
@@ -45,23 +49,6 @@ class ToolBarOptions(QWidget):
         optionButton = toolBarBttn(self, None, 'Arquivo', fileOptions)
 
         self.layout.addWidget(optionButton)
-
-        # newProjectBtn = toolBarBttn(self, 'fa5s.file', 'Novo Projeto')
-        # newProjectBtn.clicked.connect(parent.newProject)
-
-        # saveBtn = toolBarBttn(self, 'fa5s.save', 'Salvar')
-        # saveBtn.clicked.connect(parent.saveFlow)
-
-        # saveAsBtn = toolBarBttn(self, 'mdi6.content-save-plus', 'Salvar Como')
-        # saveAsBtn.clicked.connect(parent.saveAsFlow)
-
-        # openBtn = toolBarBttn(self, 'fa5s.folder-open', 'Abrir Fluxo')
-        # openBtn.clicked.connect(parent.openFlow)
-
-        # self.layout.addWidget(newProjectBtn)
-        # self.layout.addWidget(saveBtn)
-        # self.layout.addWidget(saveAsBtn)
-        # self.layout.addWidget(openBtn)
     
     def paintEvent(self, pe):
         o = QStyleOption()

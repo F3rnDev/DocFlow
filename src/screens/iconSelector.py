@@ -12,7 +12,7 @@ class IconSelector(QWidget):
 
         self.list_widget = QListWidget(self)
         self.list_widget.setGeometry(0, 50, 700, 650)
-
+        
         qtawesome._instance()
         fontMaps = qtawesome._resource['iconic'].charmap
 
