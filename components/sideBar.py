@@ -110,7 +110,6 @@ class StepInfoUI(QWidget):
         self.iconWindow.content.selectItem.connect(self.parent().parent().updateStepIcon)    
     
     def checkIcon(self, iconEntered:str):
-        print("check icon")
         qtawesome._instance()
         fontMaps = qtawesome._resource['iconic'].charmap
 

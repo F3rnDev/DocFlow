@@ -1,10 +1,11 @@
-from PyQt6.QtGui import QCloseEvent, QResizeEvent
+from PyQt6.QtGui import QCloseEvent, QResizeEvent, QIcon
 from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit, QLabel, QComboBox, QVBoxLayout, QHBoxLayout
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from components.toolBar import ToolBarOptions
 from components.flowCanvas import FlowCanvas
 from components.sideBar import SideBar
 from src.main.project import Project
+from src.main.resource import Resource
 import qtawesome
 
 class FlowCreator(QWidget):
@@ -17,12 +18,10 @@ class FlowCreator(QWidget):
     def setup(self):
         self.setGeometry(0, 0, 1920, 1080)
 
+        #The background canvas
         self.flow = FlowCanvas(self)
-        #---------------------delete later---------------------
-        resetCanvasBtn = QPushButton('Resetar Posição do Fluxo', self)
-        resetCanvasBtn.setGeometry(700, 20, 200, 50)
-        resetCanvasBtn.clicked.connect(self.flow.resetCanvasPosition)
-        #---------------------END delete later---------------------
+
+        #The entire upper toolbar
         self.toolbar = QWidget(self)
         self.toolbar.setGeometry(0, 0, 1920, 180)
 
@@ -31,6 +30,7 @@ class FlowCreator(QWidget):
         toolbarLayout.setContentsMargins(0, 0, 0, 0)
         toolbarLayout.setSpacing(0)
 
+        #The project name section of the toolbar
         self.proj = QWidget(self)
         self.proj.setGeometry(0, 0, 1920, 50)
         self.proj.setStyleSheet(''' background-color: #ffffff; border: none;''')
@@ -41,6 +41,7 @@ class FlowCreator(QWidget):
         projLayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         projLayout.setContentsMargins(20, 10, 0, 0)
 
+        #The project name input
         self.displayName = QLineEdit(self.project.name, self)
         self.displayName.setPlaceholderText('Nome do Projeto')
         self.displayName.setStyleSheet('''
@@ -54,18 +55,55 @@ class FlowCreator(QWidget):
         projLayout.addWidget(self.displayName)
         projLayout.addStretch(1)
 
+        #The project toolbar options
         self.toolBarOpt = ToolBarOptions(self)
         toolbarLayout.addWidget(self.toolBarOpt)
 
+        #The language picker
+        self.languagePicker = QComboBox(self)
+        self.languagePicker.setGeometry(20, 200, 110, 50)
+        self.languagePicker.setIconSize(QSize(50, 50))
+
+        downArrowPath = Resource.resource_path('assets/down-arrow.svg')
+        downArrowPath = downArrowPath.replace('\\', '/')
+        fullStykeSheet = """
+            QComboBox {
+                background-color: transparent;
+                selection-background-color: transparent;
+                selection-color: #000000;
+                font-size: 15px;
+                font-weight: bold;
+            }
+            QComboBox::hover {
+                background-color: #d0d0d0;
+                border: none;
+            }
+            QComboBox::drop-down{
+                border: none;
+                background-color: transparent;
+                width: 15px;
+                height: 50px;
+                margin-left: 5px;
+            }
+            
+            QComboBox::down-arrow{
+                image: url('%1');
+            }
+        """
+        self.languagePicker.setStyleSheet(fullStykeSheet.replace('%1', downArrowPath))
+        for lang in self.project.languages:
+            self.languagePicker.addItem(QIcon(Resource.resource_path(f"assets/flags/{lang.cur.value}.svg")), lang.cur.value.upper())
+        
+        #The stepInfo sideBar
         self.sideBar = SideBar(self)
 
-        #---------------------delete later---------------------
-        self.languagePicker = QComboBox(self)
-        self.languagePicker.setGeometry(900, 20, 200, 50)
+        #Connect Language Picker, crashes if created before SideBar
         self.languagePicker.currentIndexChanged.connect(self.flow.changeLanguage)
-        self.languagePicker.hide()
-        for lang in self.project.languages:
-            self.languagePicker.addItem(lang.cur.name)
+            
+        #---------------------delete later---------------------
+        resetCanvasBtn = QPushButton('Resetar Posição do Fluxo', self)
+        resetCanvasBtn.setGeometry(700, 20, 200, 50)
+        resetCanvasBtn.clicked.connect(self.flow.resetCanvasPosition)
         #---------------------END delete later---------------------
     
     def resizeEvent(self, a0: QResizeEvent | None) -> None:

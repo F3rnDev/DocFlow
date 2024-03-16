@@ -5,7 +5,11 @@ a = Analysis(
     binaries=[],
     
     datas=[("assets/defaultIcon.png", "assets"),
-        ("assets/nextFlowStep.png", "assets")
+        ("assets/nextFlowStep.png", "assets"),
+        ("assets/down-arrow.svg", "assets"),
+        ("assets/flags/por.svg", "assets/flags"),
+        ("assets/flags/spa.svg", "assets/flags"),
+        ("assets/flags/eng.svg", "assets/flags"),
     ],
 
     hiddenimports=[],
