@@ -6,7 +6,7 @@ import textwrap
 from enum import Enum
 
 class FlowStatus(Enum):
-    NOT_STARTED = 0
+    # NOT_STARTED = 0
     IN_PROGRESS = 1
     DONE = 2
 
@@ -82,11 +82,11 @@ class FlowStep(QWidget):
         iconColor = ''
 
         match curStatus:
-            case FlowStatus.NOT_STARTED:
-                self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #aeabab; background-color: white;')
-                self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #aeabab;')
-                arrowColor = '#aeabab'
-                iconColor = '#8497B0'
+            # case FlowStatus.NOT_STARTED:
+            #     self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #aeabab; background-color: white;')
+            #     self.flowTxt.setStyleSheet(f'{self.flowTxt.styleSheet()} color: #aeabab;')
+            #     arrowColor = '#aeabab'
+            #     iconColor = '#8497B0'
             
             case FlowStatus.IN_PROGRESS:
                 self.flowImg.setStyleSheet(f'{self.flowImg.styleSheet()} border-color: #2F5597; background-color: #2F5597;')
