@@ -6,6 +6,8 @@ from src.main.screenManager import ScreenManager as manager
 from components.window import Window
 
 class SideBar(QWidget):
+    collapseSignal = pyqtSignal(bool)
+
     def __init__(self, parent):
         super().__init__(parent)
         self.setParent(parent)
@@ -13,6 +15,7 @@ class SideBar(QWidget):
     
     def setup(self):
         self.collapsed = True
+        self.setDisabled(True)
 
         self.widgetWidth = 450
         self.setFixedWidth(self.widgetWidth)
@@ -50,6 +53,8 @@ class SideBar(QWidget):
             elif not self.collapsed and self.x() == collapsedPos:
                 self.animateCollapse(expandedPos, self.y())
                 self.collapseArrow.setText('>') 
+            
+        self.collapseSignal.emit(self.collapsed)
     
     def animateCollapse(self, posx, posy):
         self.animation = QPropertyAnimation(self, b'pos')

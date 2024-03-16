@@ -1,6 +1,6 @@
 from PyQt6.QtGui import QCloseEvent, QResizeEvent, QIcon
 from PyQt6.QtWidgets import QPushButton, QWidget, QFileDialog, QLineEdit, QLabel, QComboBox, QVBoxLayout, QHBoxLayout
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QPoint, QPropertyAnimation, QEasingCurve
 from components.toolBar import ToolBarOptions
 from components.flowCanvas import FlowCanvas
 from components.sideBar import SideBar
@@ -73,6 +73,7 @@ class FlowCreator(QWidget):
                 selection-color: #000000;
                 font-size: 15px;
                 font-weight: bold;
+                border-radius: 15px
             }
             QComboBox::hover {
                 background-color: #d0d0d0;
@@ -100,17 +101,36 @@ class FlowCreator(QWidget):
         #Connect Language Picker, crashes if created before SideBar
         self.languagePicker.currentIndexChanged.connect(self.flow.changeLanguage)
             
-        #---------------------delete later---------------------
-        resetCanvasBtn = QPushButton('Resetar Posição do Fluxo', self)
-        resetCanvasBtn.setGeometry(700, 20, 200, 50)
-        resetCanvasBtn.clicked.connect(self.flow.resetCanvasPosition)
-        #---------------------END delete later---------------------
+        #Reset Canvas Position
+        self.resetCanvasBtn = QPushButton('', self)
+        self.resetCanvasBtn.setGeometry(0, 0, 80, 50)
+        self.resetCanvasBtn.setIcon(qtawesome.icon('mdi6.fit-to-screen', color='black'))
+        self.resetCanvasBtn.setIconSize(QSize(50, 50))
+        self.resetCanvasBtn.clicked.connect(self.flow.resetCanvasPosition)
+
+        #Connect the stepInfo sideBar to the resetCanvasBtn
+        self.sideBar.collapseSignal.connect(self.moveResetBtn)
+    
+    def moveResetBtn(self, collapse: bool):
+        if not collapse:
+            self.animateResetBtn(self.resetCanvasBtn, self.width() - self.sideBar.widgetWidth - self.resetCanvasBtn.width(), 200)
+        else:
+            self.animateResetBtn(self.resetCanvasBtn, self.width() - self.sideBar.collapseArrow.width() - self.resetCanvasBtn.width(), 200)
+    
+    def animateResetBtn(self, obj, posx, posy):
+        obj.animation = QPropertyAnimation(obj, b'pos')
+        obj.animation.setDuration(300)
+        obj.animation.setStartValue(QPoint(obj.x(), obj.y()))
+        obj.animation.setEndValue(QPoint(posx, posy))
+        obj.animation.setEasingCurve(QEasingCurve.Type.InOutCubic)
+        obj.animation.start()
     
     def resizeEvent(self, a0: QResizeEvent | None) -> None:
         self.toolbar.resize(self.width(), 180)
         self.flow.resetCanvasPosition()
 
         self.sideBar.responsiveResize(self.width(), self.height(), self.toolbar.height())
+        self.resetCanvasBtn.setGeometry(self.sideBar.x() - 80, 200, 80, 50)
     
     def loadStepInfo(self, stepId: int):
         if stepId == None:
