@@ -144,6 +144,7 @@ class FlowCreator(QWidget):
     
     def addFlowStep(self):
         self.project.addSteps()
+        self.flow.selectedStep = self.project.getFlowSteps(self.flow.curLang).__len__()-1
         self.flow.updateFlow(self.project.getFlowSteps(self.flow.curLang))
     
     def removeFlowStep(self):
