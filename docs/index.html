@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>DocFlow Documentation</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -12,7 +12,7 @@
 
   <!-- langPicker, custom asset -->
   <nav>
-    <select id="langPicker" onchange="redirecionarPagina()">
+    <select id="langPicker" onchange="selectedLang()" hidden> <!-- work in progress, unhide later -->
       <option value="pt-br">por</option>
       <option value="en-us">eng</option>
     </select>
@@ -37,7 +37,7 @@
       var lang = '';
       var windowLocation = getWindowLocation();
 
-      var desiredLang = "en-us";
+      var desiredLang = "pt-br"; //change back to en-us when you've translated the docs
       if (languageExists(userLang)) {
         desiredLang = userLang;
       }
@@ -53,6 +53,7 @@
 
     function languageExists(lang) {
       var langs = langPicker.options;
+
       for (var i = 0; i < langs.length; i++) {
         if (langs[i].value == lang) {
           return true;
@@ -82,7 +83,7 @@
       return splitRef;
     }
   
-    function redirecionarPagina() {
+    function selectedLang() {
       var lang = document.getElementById("langPicker").value;
 
       var curUrlRef = "#/" + lang;
