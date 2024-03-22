@@ -11,12 +11,12 @@
 <body>
 
   <!-- langPicker, custom asset -->
-  <!-- <nav>
+  <nav>
     <select id="langPicker" onchange="redirecionarPagina()">
       <option value="/pt-br">por</option>
       <option value="/en-us">eng</option>
     </select>
-  </nav> -->
+  </nav>
 
   <div id="app"></div>
   <script>
@@ -26,7 +26,7 @@
       homepage: 'home.md'
     }
   </script>
-  
+
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
 
@@ -36,7 +36,7 @@
       var lang = window.location.pathname;
 
       if (lang == "/"){
-        lang = "/pt-br";
+        lang = "./pt-br";
         window.location.href = lang;
       }
 
