@@ -38,7 +38,12 @@
 
       if (lang.replace("DocFlow", "").replace("/", "") == "")
       {
-        lang = languageExists(userLang) ? userLang : "en-us";
+        if (languageExists(userLang)){
+          lang = userLang;
+        }
+        else {
+          lang = "en-us";
+        }
 
         window.location.href = "#/" + lang + "/home";
       }
