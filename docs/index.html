@@ -13,8 +13,8 @@
   <!-- langPicker, custom asset -->
   <nav>
     <select id="langPicker" onchange="redirecionarPagina()">
-      <option value="/pt-br">por</option>
-      <option value="/en-us">eng</option>
+      <option value="pt-br/">por</option>
+      <option value="en-us/">eng</option>
     </select>
   </nav>
 
@@ -36,9 +36,11 @@
       var lang = window.location.pathname;
 
       if (lang == "/"){
-        lang = "./pt-br";
+        lang = "pt-br/";
         window.location.href = lang;
       }
+
+      console.log(lang);
 
       document.getElementById("langPicker").value = lang;
     });
