@@ -33,22 +33,18 @@
   <!-- docflow langPicker code -->
   <script> 
     document.addEventListener("DOMContentLoaded", function() {
-      var lang = window.location.pathname;
       var userLang = navigator.language.toLowerCase();
+      var lang = '';
+      var windowLocation = getWindowLocation();
 
-      var langCheck = lang.replace("DocFlow", "").replace("/", "")
+      var desiredLang = "en-us";
+      if (languageExists(userLang)) {
+        desiredLang = userLang;
+      }
 
-      console.log(langCheck);
-
-      if (langCheck == "" || langCheck == "/")
+      if (windowLocation == "" || windowLocation == "/")
       {
-        if (languageExists(userLang)){
-          lang = userLang;
-        }
-        else {
-          lang = "en-us";
-        }
-
+        lang = desiredLang;
         window.location.href = "#/" + lang + "/home";
       }
 
