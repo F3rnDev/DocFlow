@@ -36,7 +36,11 @@
       var lang = window.location.pathname;
       var userLang = navigator.language.toLowerCase();
 
-      if (lang.replace("DocFlow", "").replace("/", "") == "")
+      var langCheck = lang.replace("DocFlow", "").replace("/", "")
+
+      console.log(langCheck);
+
+      if (langCheck == "")
       {
         if (languageExists(userLang)){
           lang = userLang;
@@ -56,6 +60,7 @@
       for (var i = 0; i < langs.length; i++) {
         if (langs[i].value == lang) {
           return true;
+          break;
         }
       }
 
