@@ -2,7 +2,7 @@
 
 Para instalar o Docflow em sua maquina, siga os passos abaixo:
 
-1. Acesse a página de [download](https://github.com/F3rnDev/DocFlow)
+1. Acesse a página de [download](https://github.com/F3rnDev/DocFlow/releases/tag/v0.2.0)
 
 2. Baixe o zip do projeto
 
@@ -14,4 +14,4 @@ Para instalar o Docflow em sua maquina, siga os passos abaixo:
 
 6. Pronto! O Docflow já está instalado em sua máquina
 
-###### [voltar para Home]()
+#### [voltar para Home](pt-br/home.md)

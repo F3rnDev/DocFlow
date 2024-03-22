@@ -1,4 +1,2 @@
-# DocFlow
- A program that creates and generates flow images
-
-## [Como instalar](/instalacao.md)
+# Primeiros Passos
+### [Como instalar](pt-br/instalacao.md)

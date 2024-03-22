@@ -11,12 +11,12 @@
 <body>
 
   <!-- langPicker, custom asset -->
-  <!-- <nav>
+  <nav>
     <select id="langPicker" onchange="redirecionarPagina()">
-      <option value="./pt-br/">por</option>
-      <option value="./en-us/">eng</option>
+      <option value="pt-br">por</option>
+      <option value="en-us">eng</option>
     </select>
-  </nav> -->
+  </nav>
 
   <div id="app"></div>
   <script>
@@ -31,23 +31,59 @@
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
 
   <!-- docflow langPicker code -->
-  <!-- <script> 
+  <script> 
     document.addEventListener("DOMContentLoaded", function() {
       var lang = window.location.pathname;
+      var userLang = navigator.language.toLowerCase();
 
-      if (lang == "/"){
-        lang = "./pt-br/";
-        window.location.href = lang;
+      if (lang.replace("DocFlow", "").replace("/", "") == "")
+      {
+        lang = languageExists(userLang) ? userLang : "en-us";
+
+        window.location.href = "#/" + lang + "/home";
       }
 
       document.getElementById("langPicker").value = lang;
     });
+
+    function languageExists(lang) {
+      var langs = langPicker.options;
+      for (var i = 0; i < langs.length; i++) {
+        if (langs[i].value == lang) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function getWindowLocation() {
+      var splitRef = window.location.href.split('#')[1];
+      var langs = langPicker.options;
+
+      var lang = "";
+
+      for (var i = 0; i < langs.length; i++) {
+        if (splitRef.includes(langs[i].value)) 
+        {
+          lang = langs[i].value;
+          break;
+        }
+      }
+
+      splitRef = splitRef.replace(lang, "").replace("/", "");
+
+      return splitRef;
+    }
   
     function redirecionarPagina() {
       var lang = document.getElementById("langPicker").value;
-      console.log(lang);
-      window.location.href = lang;
+
+      var curUrlRef = "#/" + lang;
+      var windowLocation = getWindowLocation();
+
+      window.location.href = curUrlRef + windowLocation;
     }
-  </script> -->
+  </script>
 </body>
 </html>
